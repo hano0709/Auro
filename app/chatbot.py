@@ -30,6 +30,8 @@ config = types.GenerateContentConfig(
         top_gainers_losers,
         fetch_commodity_history,
         get_current_datetime,
+        get_news_sentiment,
+        get_intraday_stock,
     ], #funtions to call
     temperature = 0.7, #0.0 for more accurate, 2.0 for more creative.
     max_output_tokens = 3000,
