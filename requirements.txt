@@ -13,3 +13,4 @@ tqdm
 schedule
 google-generativeai
 cloudinary
+asyncio

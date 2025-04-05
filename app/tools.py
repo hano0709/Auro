@@ -214,7 +214,7 @@ def predict_stock_price(ticker: str, days: int) -> str:
     """
     try:
         print(days)
-        from stock_prediction_transformer import StockManager
+        from app.stock_prediction_transformer import StockManager
         stock_manager = StockManager()
         
         # Ensure models directory exists
