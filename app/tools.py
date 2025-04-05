@@ -20,6 +20,7 @@ from sklearn.preprocessing import MinMaxScaler
 from typing import Union, List, Dict
 import google.generativeai as genai
 from dotenv import load_dotenv
+from datetime import datetime
 
 load_dotenv()
 api_key = os.getenv("GEMINI_API_KEY4")
@@ -57,8 +58,15 @@ def get_api_key():
 
     return os.getenv("ALPHA_API_KEY1")
 
-def fetch_stock_info(symbol: str):
-    """Fetches financial metrics like Market Cap, Revenue, and Revenue Multiple using Alpha Vantage."""
+def fetch_stock_info(symbol: str) -> str:
+    """
+    Fetches financial metrics like Market Cap, Revenue, and Revenue Multiple using Alpha Vantage.
+    
+    Args:
+        symbol: The ticker symbol of US based stock.
+    Returns:
+        A string message containing the stock info.
+    """
     if not ALPHA_API_KEY:
         return "Error: Alpha Vantage API key is missing. Please set ALPHA_API_KEY."
 
@@ -117,7 +125,17 @@ def fetch_stock_info(symbol: str):
 
     return "\n".join(insights)
 
-def fetch_stock_history(ticker: str, days: int):
+def fetch_stock_history(ticker: str, days: int) -> str:
+    """
+    Gets the stock price of a stock few days from the past, uses Yahoo Finance.
+
+    Args:
+        ticker: The ticker symbol of the stock. Append .NS for National Stock Exchange of India, .BO for Bombay Stock Exchange of India, .L for London Stock Exchange.
+        days: Number of days into the past to get the stock price.
+
+    Returns:
+        A string message containing the dates and prices.
+    """
     try:
         stock = yf.Ticker(ticker)
         hist = stock.history(period=f"{days}d")
@@ -143,7 +161,7 @@ def fetch_stock_history(ticker: str, days: int):
         return f"Error fetching stock history for {ticker}: {str(e)}"
     
 def get_prediction_chart(ticker: str, predictions, current_price, volatility):
-    """Generate a PNG image of stock price predictions."""
+    """Generate a PNG image of stock price predictions. Used by the predict price function."""
     days = np.arange(len(predictions))
     confidence_intervals = [np.sqrt(i / 252) * volatility * current_price for i in range(len(predictions))]
 
@@ -183,25 +201,24 @@ def get_prediction_chart(ticker: str, predictions, current_price, volatility):
     
     return image_url
 
-def predict_stock_price(ticker: str, days: int):
+def predict_stock_price(ticker: str, days: int) -> str:
+    """
+    Predicts the stock price of the stock few days into the future. Trained on data from Yahoo Finance, and custom made transformer for prediction.
+
+    Args:
+        ticker: The ticker symbol of the stock to predict. Append .NS for National Stock Exchange of India, .BO for Bombay Stock Exchange of India, .L for London Stock Exchange.
+        days: Number of days into the future to predict the price.
+
+    Returns:
+        A string message telling the stock price, also providing a link to the graph plot.
+    """
     try:
+        print(days)
         from stock_prediction_transformer import StockManager
         stock_manager = StockManager()
-
-        # Define the valid durations and find the closest match
-        duration_map = {
-            "1d": 1, "3d": 3, "1w": 5, "1mo": 22,
-            "3mo": 66, "6mo": 132, "1y": 252
-        }
-        closest_duration = min(duration_map, key=lambda d: abs(duration_map[d] - days))
-        duration = closest_duration
-
-        print(f"📌 Requested {days} days → Using closest valid duration: `{duration}` ({duration_map[duration]} days)")
-        # ✅ Ensure `readable_duration` is set before using it
-        readable_duration = duration_map.get(duration, f"{duration_map[duration]} days")
         
         # Ensure models directory exists
-        models_dir = "models"
+        models_dir = ".\models"
         if not os.path.exists(models_dir):
             try:
                 os.makedirs(models_dir)
@@ -216,6 +233,7 @@ def predict_stock_price(ticker: str, days: int):
         if not os.path.exists(model_path):
             print(f"⚠️ No pre-trained model found for {ticker}. Training now...")
             try:
+                print("before adding stock")
                 add_msg = stock_manager.add_stock(ticker)
                 print(f"📌 Add Stock Result: {add_msg}")
 
@@ -233,12 +251,12 @@ def predict_stock_price(ticker: str, days: int):
 
         # Pass the correctly formatted duration instead of `days`
         try:
-            _, predictions, info = stock_manager.predict_stock(ticker, duration)
+            _, predictions, info = stock_manager.predict_stock(ticker, days)
         except Exception as pred_error:
             print(f"❌ Prediction error: {pred_error}")
             return f"❌ Error during stock prediction: {pred_error}"
 
-        print(f"📊 Raw Predictions for {duration}: {predictions}")
+        print(f"📊 Raw Predictions for {days}: {predictions}")
 
         if predictions is None or len(predictions) == 0:
             return "❌ Model did not generate valid multi-day predictions."
@@ -263,29 +281,8 @@ def predict_stock_price(ticker: str, days: int):
             f"📊 **Model Accuracy:** {accuracy:.2f}%. While I try to be precise, the market can be unpredictable! 🎢\n\n"
             f"📈 **Prediction Chart:** [View Graph]({img_url})"
         )
-
-        """
-        # Use Gemini to generate a summary
-        try:
-            # Summary generation
-            summary_prompt = (
-                f"Summarize the stock prediction for {ticker}. The predicted price is {predicted_price:.2f}, "
-                f"current price is {current_price:.2f}, and the expected change is {change_str}. "
-                f"The model's accuracy is {accuracy:.2f}%. Provide a short and clear summary."
-            )
-            
-            summary_response = model.generate_content(summary_prompt)
-            summary = summary_response.text.strip()
-        except Exception as e:
-            print(f"Error generating summary: {e}")
-            summary = "A brief overview of the stock prediction could not be generated."
         
-        
-        # Combine the conversational response with the summary
-        full_response = f"{response}\n\n**Summary:** {summary}"
-        """
-        
-        return response
+        return str(response)
 
     except Exception as e:
         import traceback
@@ -294,7 +291,7 @@ def predict_stock_price(ticker: str, days: int):
 
 def currency_exchange(from_name: str, to_name: str) -> str:
     """
-    Obtains the current day's currency exchange price from one to another.
+    Obtains the current day's currency exchange price from one to another. Obtains data from Alpha Vantage.
 
     Args:
         from_name: The currency to get the exchange rate for. It can either be a physical currency or digital/crypto currency. For example: USD or BTC.
@@ -316,7 +313,7 @@ def currency_exchange(from_name: str, to_name: str) -> str:
 
 def currency_exchange_daily(from_name: str, to_name: str, days: int) -> str:
     """
-    Returns the past few days currency exchange price from one to another.
+    Returns the past few days currency exchange price from one to another. Obtains data from Alpha Vantage.
 
     Args:
         from_name: The currency from which to convert. Eg: EUR
@@ -346,7 +343,7 @@ def currency_exchange_daily(from_name: str, to_name: str, days: int) -> str:
 
 def crypto_currency_exchange(from_name: str, to_name: str) -> str:
     """
-    Obtains the current day's crypto exchange price into the country currency price.
+    Obtains the current day's crypto exchange price into the country currency price. Obtains data from Alpha Vantage.
 
     Args:
         from_name: The crypto currency symbol to get the exchange rate for. For example: BTC.
@@ -368,7 +365,7 @@ def crypto_currency_exchange(from_name: str, to_name: str) -> str:
 
 def digital_currency_daily(from_name: str, to_name: str, days: int) -> str:
     """
-    Obtains the past few days exchange price of a digital/crypto currency to a physical one.
+    Obtains the past few days exchange price of a digital/crypto currency to a physical one. Obtains data from Alpha Vantage.
 
     Args:
         from_name: The digital/crypto currency whose price to obtain. Eg: BTC.
@@ -470,7 +467,7 @@ def loan_calculator(principal: float, annual_rate: float, years: int) -> Dict[st
 
 def mortgage_calculator(principal: float, annual_rate: float, years: int) -> Dict[str, float | List[Dict[str, float]]]:
     """
-    Calculate monthly mortgage payment, total payment, total interest, and provide an amortization schedule only for home mortgage.
+    Calculate monthly mortgage payment, total payment, total interest, and provide an amortization schedule only for home mortgage. Uses the amortization formula for calculation.
 
     Args:
         principal: Total loan amount (P)
@@ -521,7 +518,7 @@ def mortgage_calculator(principal: float, annual_rate: float, years: int) -> Dic
 
 def top_gainers_losers() -> str:
     """
-    Returns the top 10 gainers and losers information in the stock market for the current date.
+    Returns the top 10 gainers and losers information in the stock market for the current date. Obtains data from Alpha Vantage.
     """
     try:
         url = f'https://www.alphavantage.co/query?function=TOP_GAINERS_LOSERS&apikey={ALPHA_API_KEY}'
@@ -566,7 +563,7 @@ def top_gainers_losers() -> str:
 
 def fetch_commodity_history(ticker: str, days: int) -> Union[str, List[dict]]:
     """
-    Fetch historical commodity prices for a given ticker and number of days into the past.
+    Fetch historical commodity prices for a given ticker and number of days into the past. Obtains data from Yahoo Finance.
     
     Args:
         ticker (str): Commodity ticker symbol for the stock whose history is to be obtained
@@ -587,6 +584,15 @@ def fetch_commodity_history(ticker: str, days: int) -> Union[str, List[dict]]:
     
     except Exception as e:
         return f"Error fetching stock history for {ticker}: {str(e)}"
+    
+def get_current_datetime() -> str:
+    """
+    Returns current date and time of the local machine.
+    """
+    now = datetime.now()
+    formatted = now.strftime("%Y-%m-%d %H:%M:%S")
+    
+    return f"CUrrent Date and Time: {formatted}"
 
 # Example usage
 if __name__ == "__main__":
