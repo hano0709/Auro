@@ -74,8 +74,8 @@ def main():
         - Predict stock prices using a transformer & provide a graph for better understanding.  
 
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**NOTE:**  
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Prediction works only for stocks listed on NASDAQ & NYSE (Support for Indian stocks will be added).  
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Pre-trained models: **Apple, Nike, NVIDIA**. *(Predictions are going to be inaccurate as Hugging Face is using a CPU.)*  
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Prediction works on US as well as Indian Stocks.  
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Pre-trained models are available for some stocks from both US and Indian based**.
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Predictions are more accurate when ran on a **GPU** and for **short-term forecasts**.  
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- For stocks that are not pre-trained, our chatbot will **automatically train a model**, but due to the lack of GPU while hosting, **training may take up to 2 hours**.  
 
