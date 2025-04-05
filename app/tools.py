@@ -25,7 +25,7 @@ from datetime import datetime
 # Helper function
 def get_api_key():
     """Retrieve the API key stored at chatbot.py, it can be the default as well as the user entered one."""
-    from app.chatbot import ALPHA_API_KEY
+    from chatbot import ALPHA_API_KEY
     return ALPHA_API_KEY
 
 load_dotenv()
@@ -136,12 +136,12 @@ def fetch_stock_history(ticker: str, days: int) -> str:
         result = hist.to_dict(orient="records")
 
         formatted_data = "\n".join([
-            f"📅 Date: {entry['Date']}, Close: ${round(entry['Close'], 2)}"
+            f"Date: {entry['Date']}, Close: ${round(entry['Close'], 2)}"
             for entry in result
         ])
 
         # 🔥 Debugging: Print final formatted response before returning
-        print(f"📤 Returning Stock History:\n{formatted_data}")
+        print(f"Returning Stock History:\n{formatted_data}")
 
         return formatted_data if formatted_data.strip() else f"No historical data found for {ticker}."
 
