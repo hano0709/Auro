@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+gradio
+google-genai
+python-dotenv
+torch
