@@ -4,4 +4,8 @@ class ChatRequest(BaseModel):
     message: str
 
 class ChatResponse(BaseModel):
-    response: str 
+    response: str
+    
+class ChatWithHistoryRequest(BaseModel):
+    message: str
+    history: List[str]

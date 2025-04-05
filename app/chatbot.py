@@ -37,10 +37,16 @@ config = types.GenerateContentConfig(
     """,
     )
 
-temp = client.Client(api_key = GEMINI_API_KEY)
-chat = temp.chats.create(model = "gemini-1.5-pro", config = config)
+bot = client.Client(api_key = GEMINI_API_KEY)
+chat = bot.chats.create(model = "gemini-1.5-pro", config = config)
 
-
+def base_chat(message):
+    response = bot.models.generate_content(
+        model = "gemini-2.0-flash",
+        contents = message,
+        config = config,
+    )
+    return response.text
 
 def chatting(message, history):
     try:
