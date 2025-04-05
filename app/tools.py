@@ -22,9 +22,14 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 from datetime import datetime
 
+# Helper function
+def get_api_key():
+    """Retrieve the API key stored at chatbot.py, it can be the default as well as the user entered one."""
+    from app.chatbot import ALPHA_API_KEY
+    return ALPHA_API_KEY
+
 load_dotenv()
-api_key = os.getenv("GEMINI_API_KEY4")
-ALPHA_API_KEY = os.getenv("ALPHA_API_KEY1")
+api_key = os.getenv("GEMINI_API_KEY")
         
 # Configure the API
 genai.configure(api_key=api_key)
@@ -39,24 +44,6 @@ cloudinary.config(
 )
 # Assuming the stock prediction transformer code is in the same directory
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from stock_prediction_transformer import (
-    StockDataHandler, 
-    StockDataset, 
-    StockTransformer, 
-    ModelTrainer,
-    DEFAULT_SEQ_LEN,
-    DEVICE
-)
-
-# Helper function
-def get_api_key():
-    """Retrieve the API key, prioritizing ALPHA_KEY2 if it is set and not empty, otherwise using ALPHA_KEY1."""
-    load_dotenv()
-    alpha_key2 = os.getenv("ALPHA_API_KEY2")
-    if alpha_key2 and alpha_key2.strip():  # Ensure ALPHA_KEY2 is not empty or just spaces
-        return alpha_key2
-
-    return os.getenv("ALPHA_API_KEY1")
 
 def fetch_stock_info(symbol: str) -> str:
     """
@@ -67,6 +54,7 @@ def fetch_stock_info(symbol: str) -> str:
     Returns:
         A string message containing the stock info.
     """
+    ALPHA_API_KEY = get_api_key()
     if not ALPHA_API_KEY:
         return "Error: Alpha Vantage API key is missing. Please set ALPHA_API_KEY."
 
@@ -218,7 +206,7 @@ def predict_stock_price(ticker: str, days: int) -> str:
         stock_manager = StockManager()
         
         # Ensure models directory exists
-        models_dir = ".\models"
+        models_dir = ".\\models"
         if not os.path.exists(models_dir):
             try:
                 os.makedirs(models_dir)
@@ -299,6 +287,10 @@ def currency_exchange(from_name: str, to_name: str) -> str:
     Returns:
         A string message telling the exchange rate.
     """
+    ALPHA_API_KEY = get_api_key()
+    if not ALPHA_API_KEY:
+        return "Error: Alpha Vantage API key is missing. Please set ALPHA_API_KEY."
+    
     url = f'https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency={from_name}&to_currency={to_name}&apikey={ALPHA_API_KEY}'
     r = requests.get(url)
     data = r.json()
@@ -322,7 +314,10 @@ def currency_exchange_daily(from_name: str, to_name: str, days: int) -> str:
     Returns:
         A string in json format telling the exchange rates of past few days.
     """
-
+    ALPHA_API_KEY = get_api_key()
+    if not ALPHA_API_KEY:
+        return "Error: Alpha Vantage API key is missing. Please set ALPHA_API_KEY."
+    
     url = f'https://www.alphavantage.co/query?function=FX_DAILY&from_symbol={from_name}&to_symbol={to_name}&apikey={ALPHA_API_KEY}'
     r = requests.get(url)
     data = r.json()
@@ -351,6 +346,10 @@ def crypto_currency_exchange(from_name: str, to_name: str) -> str:
     Returns:
         A string message telling the exchange rate.
     """
+    ALPHA_API_KEY = get_api_key()
+    if not ALPHA_API_KEY:
+        return "Error: Alpha Vantage API key is missing. Please set ALPHA_API_KEY."
+    
     url = f'https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency={from_name}&to_currency={to_name}&apikey={ALPHA_API_KEY}'
     r = requests.get(url)
     data = r.json()
@@ -376,7 +375,9 @@ def digital_currency_daily(from_name: str, to_name: str, days: int) -> str:
     In case of error:
         Get the convertion of US dollars and use the currency_exchange_daily function to convert the obtained US dollars into that currency, use the calculator function when necessary.
     """
-
+    ALPHA_API_KEY = get_api_key()
+    if not ALPHA_API_KEY:
+        return "Error: Alpha Vantage API key is missing. Please set ALPHA_API_KEY."
 
     url = f'https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol={from_name}&market={to_name}&apikey={ALPHA_API_KEY}'
     r = requests.get(url)
@@ -520,6 +521,10 @@ def top_gainers_losers() -> str:
     """
     Returns the top 10 gainers and losers information in the stock market for the current date. Obtains data from Alpha Vantage.
     """
+    ALPHA_API_KEY = get_api_key()
+    if not ALPHA_API_KEY:
+        return "Error: Alpha Vantage API key is missing. Please set ALPHA_API_KEY."
+    
     try:
         url = f'https://www.alphavantage.co/query?function=TOP_GAINERS_LOSERS&apikey={ALPHA_API_KEY}'
         r = requests.get(url)
