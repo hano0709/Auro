@@ -1,0 +1,7 @@
+.env
+.gitignore
+new.py 
+test.py 
+.gradio/
+app/__pycache__/
+myenv/

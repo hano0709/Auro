@@ -5,3 +5,11 @@ google-genai
 python-dotenv
 yfinance
 torch
+pandas
+numpy
+scikit-learn
+matplotlib
+tqdm
+schedule
+google-generativeai
+cloudinary

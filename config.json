@@ -1,0 +1,21 @@
+{
+    "stocks": {
+        "AAPL": {
+            "added_date": "2025-04-05 14:49:56",
+            "last_trained": null,
+            "accuracy": null,
+            "model_path": "models\\AAPL_model.pt"
+        }
+    },
+    "transformer_config": {
+        "d_model": 128,
+        "nhead": 8,
+        "num_encoder_layers": 4,
+        "num_decoder_layers": 4,
+        "dim_feedforward": 256,
+        "dropout": 0.2,
+        "batch_size": 32,
+        "learning_rate": 0.0001,
+        "epochs": 100
+    }
+}
