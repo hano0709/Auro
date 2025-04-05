@@ -1,5 +1,24 @@
 {
-    "stocks": {},
+    "stocks": {
+        "AAPL": {
+            "added_date": "2025-03-31 10:11:15",
+            "last_trained": "2025-03-31 10:18:47",
+            "accuracy": 0.9631703490970502,
+            "model_path": "models\\AAPL_model.pt"
+        },
+        "NKE": {
+            "added_date": "2025-03-31 10:19:01",
+            "last_trained": "2025-03-31 10:26:24",
+            "accuracy": 0.8971930230208599,
+            "model_path": "models\\NKE_model.pt"
+        },
+        "NVDA": {
+            "added_date": "2025-03-31 10:26:54",
+            "last_trained": "2025-03-31 10:31:37",
+            "accuracy": 0.8922456859142948,
+            "model_path": "models\\NVDA_model.pt"
+        }
+    },
     "transformer_config": {
         "d_model": 128,
         "nhead": 8,
