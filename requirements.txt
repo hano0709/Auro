@@ -3,4 +3,5 @@ uvicorn
 gradio
 google-genai
 python-dotenv
+yfinance
 torch

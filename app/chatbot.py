@@ -1,12 +1,20 @@
 from google.genai import client, types, errors
 from dotenv import load_dotenv 
+from app.tools import *
 import os
 
 load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 config = types.GenerateContentConfig(
-    tools=[],
+    tools=[
+        fetch_stock_info,
+        fetch_stock_history,
+        currency_exchange,
+        currency_exchange_daily,
+        crypto_currency_exchange,
+        digital_currency_daily,
+        ],
     temperature=0.7,
     max_output_tokens=2000,
     system_instruction="""
