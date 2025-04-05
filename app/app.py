@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from app.chatbot import base_chat
-from app.models import *
+from chatbot import base_chat
+from models import *
 
 app = FastAPI()
 
