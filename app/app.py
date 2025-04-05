@@ -1,10 +1,20 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from app.chatbot import base_chat, chatting, main
 from app.models import *
+import gradio as gr
 import asyncio
 import threading
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Adjust for production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 async def home_page():
@@ -23,8 +33,5 @@ async def chat_with_history(req: ChatWithHistoryRequest):
         response = chunk
     return {"response": response}
 
-@app.get("/gradio")
-def gradio_ui():
-    # Run Gradio in a separate thread to avoid blocking the FastAPI app
-    threading.Thread(target=main).start()
-    return {"message": "Gradio UI launched. Visit the link in terminal to access it."}
+gradio_app = main()
+app = gr.mount_gradio_app(app, gradio_app, path="/gradio")
