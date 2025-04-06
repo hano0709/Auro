@@ -55,6 +55,22 @@ CLOUDINARY_API_KEY="Your_Cloudinary_Api_Key"
 CLOUDINARY_API_SECRET="Your_Cloudinary_Api_Secret"
 ```
 
+Great idea! Adding API key instructions with clickable links will make onboarding much easier for users. You can include a **"🔐 API Key Setup"** section in your README like this:
+
+---
+
+### 🔑 Get Your API Keys Here:
+- 🧠 **Gemini (Google Generative AI):** [Get Gemini API Key](https://makersuite.google.com/app/apikey)
+- 📊 **Alpha Vantage (Stock Data):** [Get Alpha Vantage API Key](https://www.alphavantage.co/support/#api-key)
+- ☁️ **Cloudinary (Media Uploads):** [Sign up & Get Cloudinary Keys](https://console.cloudinary.com/pm)
+For Cloudinary, you need to sign-in/sign-up, then at the left botton corner click settings, it will have multiple sub-tabs where you can find the required details.
+
+Once you have the keys, replace the placeholder values in your `.env` file with the actual keys.
+
+> ⚠️ **Important:** Never share your `.env` file or API keys publicly.
+
+---
+
 #### **3️⃣ Running the Bot**  
 For windows:
 ```bash
@@ -66,3 +82,8 @@ python3 app.py
 ```
 From here you should get some links which will redirect you to the gradio interface which contains the chatbot.
 ---
+
+### Contributors (Team Code Crusadors):
+
+- **Hano Varghese:** Team Leader. Build and trained transformer on both daywise as well as intraday stock price along with chart, also retrieve stock info.
+- **Ruhan Dave:** Integrated Gemini API with function calling, speech to text with multilingual, fetch historical data of currency exchange, crypto rate, commodity.
