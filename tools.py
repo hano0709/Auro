@@ -20,6 +20,7 @@ from sklearn.preprocessing import MinMaxScaler
 from typing import Union, List, Dict
 import google.generativeai as genai
 from dotenv import load_dotenv
+from datetime import datetime
 
 load_dotenv()
 api_key = os.getenv("GEMINI_API_KEY4")
@@ -575,6 +576,79 @@ def fetch_commodity_history(ticker: str, days: int) -> Union[str, List[dict]]:
     
     except Exception as e:
         return f"Error fetching stock history for {ticker}: {str(e)}"
+
+def get_news_sentiment(ticker: str, topic: str) -> str:
+    """
+    Gives the top 10 news artical on the provided topic on a provided stock company. News data obtained from Alpha Vantage.
+
+    Args:
+        ticker: The ticker symbol of the stock company whose news to retrieve.
+        topic: The topic of the news required. Available are blockchain, manufacturing, real_estate, retail_wholesale, technology, earnings, ipo, mergers_and_acquisitions, financial_markets, economic_monetary, economic_macro, life_science, economy_fiscal, energy_transportation, finance
+        
+    Returns:
+        A string message containing all the news.
+    """    
+    try:
+        url = f'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers={ticker}&topic={topic}&limit=10&apikey={ALPHA_API_KEY}'
+        r = requests.get(url)
+        data = r.json()
+        
+        cleaned_feed = []
+
+        for item in data.get("feed", []):
+            cleaned_item = {
+                "title": item.get("title"),
+                "url": item.get("url"),
+                "published": datetime.datetime.strptime(item.get("time_published"), "%Y%m%dT%H%M%S").strftime("%Y-%m-%d %H:%M:%S"),
+                "summary": item.get("summary"),
+                "source": item.get("source"),
+                "overall_sentiment": item.get("overall_sentiment_label"),
+                "tickers": [
+                    {
+                        "ticker": t.get("ticker"),
+                        "sentiment": t.get("ticker_sentiment_label")
+                    }
+                    for t in item.get("ticker_sentiment", [])
+                ]
+            }
+            cleaned_feed.append(cleaned_item)
+
+        return str(cleaned_feed)
+    except Exception as e:
+        return f"Something went wrong. {data}"
+    
+def get_intraday_stock(ticker: str, mins: int) -> str:
+    """
+    Gives the intraday stock price of a company few mins in the past, data obtained from Alpha Vantage.
+
+    Args:
+        ticker: The ticker symbol of US based stock whose price to obtain.
+        mins: Number of minutes into the past to obtain the data.
+    Returns:
+        A string message giving all the data.
+    """
+    try:
+        url = f'https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={ticker}&interval=1min&apikey={ALPHA_API_KEY}'
+        r = requests.get(url)
+        data = r.json()
+        time_series = data.get(f'Time Series (1min)', {})
+            
+        cleaned_data = []
+        for timestamp, values in time_series.items():
+            cleaned_data.append({
+                "timestamp": timestamp,
+                "open": float(values["1. open"]),
+                "high": float(values["2. high"]),
+                "low": float(values["3. low"]),
+                "close": float(values["4. close"]),
+                "volume": int(values["5. volume"])
+            })
+            if len(cleaned_data) == mins:
+                break
+        
+        return str(cleaned_data)
+    except Exception as e:
+        return f"Something went wrong: {data}"
 
 # Example usage
 if __name__ == "__main__":
