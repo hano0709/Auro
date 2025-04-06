@@ -2,8 +2,8 @@
     "stocks": {
         "AAPL": {
             "added_date": "2025-03-31 10:11:15",
-            "last_trained": "2025-03-31 10:18:47",
-            "accuracy": 0.9631703490970502,
+            "last_trained": "2025-04-06 09:04:39",
+            "accuracy": 0.9632471900726786,
             "model_path": "models\\AAPL_model.pt"
         },
         "NKE": {
@@ -17,6 +17,12 @@
             "last_trained": "2025-03-31 10:31:37",
             "accuracy": 0.8922456859142948,
             "model_path": "models\\NVDA_model.pt"
+        },
+        "HDFCBANK.NS": {
+            "added_date": "2025-04-06 09:17:29",
+            "last_trained": "2025-04-06 09:22:19",
+            "accuracy": 0.8903105207382951,
+            "model_path": "models\\HDFCBANK.NS_model.pt"
         }
     },
     "transformer_config": {
