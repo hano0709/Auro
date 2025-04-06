@@ -14,3 +14,8 @@ schedule
 google-generativeai
 cloudinary
 asyncio
+soundfile
+transformers
+accelerate
+python-ffmpeg
+TTS
