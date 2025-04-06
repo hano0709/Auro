@@ -1,3 +1,14 @@
+---
+title: AuroFinance
+emoji: 📈
+colorFrom: indigo
+colorTo: gray
+sdk: gradio
+sdk_version: 5.23.1
+app_file: app.py
+pinned: false
+---
+
 ### **📌 AuroFinance: Gemini Financial Chatbot**  
 AURO is a Generative AI-powered financial assistant built to tackle the growing challenge of financial illiteracy in India. While millions of new investors are entering the markets, access to personalized, trustworthy financial guidance remains scarce. Traditional approaches simply cannot scale to support this massive influx.
 
