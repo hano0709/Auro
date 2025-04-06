@@ -18,7 +18,7 @@ from transformers import pipeline
 asr_pipeline = pipeline("automatic-speech-recognition", model="openai/whisper-small")
 
 load_dotenv()
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY2")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 config = types.GenerateContentConfig(
     tools=[
