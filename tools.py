@@ -23,8 +23,8 @@ from dotenv import load_dotenv
 from datetime import datetime
 
 load_dotenv()
-api_key = os.getenv("GEMINI_API_KEY4")
-ALPHA_API_KEY = os.getenv("ALPHA_API_KEY1")
+api_key = os.getenv("GEMINI_API_KEY")
+ALPHA_API_KEY = os.getenv("ALPHA_API_KEY")
         
 # Configure the API
 genai.configure(api_key=api_key)
