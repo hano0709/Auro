@@ -1,5 +1,11 @@
 ### **📌 AuroFinance: Gemini Financial Chatbot**  
-*A financial assistant leveraging Gemini AI for real-time stock, currency, and commodity insights.*  
+AURO is a Generative AI-powered financial assistant built to tackle the growing challenge of financial illiteracy in India. While millions of new investors are entering the markets, access to personalized, trustworthy financial guidance remains scarce. Traditional approaches simply cannot scale to support this massive influx.
+
+We aim to bridge this gap using the power of GenAI.
+
+AURO allows users to converse naturally about their financial goals, whether it's understanding stock market trends, evaluating investment options, or learning about loan structures. Auro powered by transformer-based deep learning models, AURO delivers data-driven, educational, and personalized financial guidance at scale—no human advisors needed.
+
+Our vision is to revolutionize financial decision-making in India by making financial literacy accessible, actionable, and conversational for every investor.
 
 ---
 
@@ -42,8 +48,8 @@ pip install -r requirements.txt
 #### **2️⃣ API Setup**  
 In order to setup the API keys, create a .env file and write the following details:  
 ```bash
-GEMINI_API_KEY1="Your_Gemini_Api_Key"
-ALPHA_API_KEY1="Your_Alpha_Vantage_Api_Key"
+GEMINI_API_KEY="Your_Gemini_Api_Key"
+ALPHA_API_KEY="Your_Alpha_Vantage_Api_Key"
 CLOUDINARY_CLOUD_NAME="Your_Cloudinary_Cloud_Name"
 CLOUDINARY_API_KEY="Your_Cloudinary_Api_Key"
 CLOUDINARY_API_SECRET="Your_Cloudinary_Api_Secret"
