@@ -18,7 +18,7 @@ from transformers import pipeline
 asr_pipeline = pipeline("automatic-speech-recognition", model="openai/whisper-small")
 
 load_dotenv()
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY3")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY2")
 
 config = types.GenerateContentConfig(
     tools=[
@@ -36,6 +36,7 @@ config = types.GenerateContentConfig(
         fetch_commodity_history,
         get_intraday_stock,
         get_news_sentiment,
+        predict_stock_intraday_price,
     ],
     temperature=0.7,
     max_output_tokens=3000,

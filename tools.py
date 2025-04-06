@@ -48,18 +48,16 @@ from stock_prediction_transformer import (
     DEVICE
 )
 
-# Helper function
-def get_api_key():
-    """Retrieve the API key, prioritizing ALPHA_KEY2 if it is set and not empty, otherwise using ALPHA_KEY1."""
-    load_dotenv()
-    alpha_key2 = os.getenv("ALPHA_API_KEY2")
-    if alpha_key2 and alpha_key2.strip():  # Ensure ALPHA_KEY2 is not empty or just spaces
-        return alpha_key2
-
-    return os.getenv("ALPHA_API_KEY1")
 
 def fetch_stock_info(symbol: str):
-    """Fetches financial metrics like Market Cap, Revenue, and Revenue Multiple using Alpha Vantage."""
+    """
+    Fetches financial metrics like Market Cap, Revenue, and Revenue Multiple using Alpha Vantage.
+    
+    Args:
+        symbol: Ticker Symbol of the stock whose info to retrieve. Append .NS for National Stock Exchange of India, .BSE for Bombay Stock Exchange of India.
+    Returns:
+        A string message with all the info.
+    """
     if not ALPHA_API_KEY:
         return "Error: Alpha Vantage API key is missing. Please set ALPHA_API_KEY."
 
@@ -118,7 +116,18 @@ def fetch_stock_info(symbol: str):
 
     return "\n".join(insights)
 
-def fetch_stock_history(ticker: str, days: int):
+def fetch_stock_history(ticker: str, days: int) -> str:
+    """ 
+    Returns the stock price of a stock few days into the past. Data obtained from Yahoo Finance.
+    
+    Args:
+        ticker: Ticker symbol of the stock to whose historical price to retrieve. Append .NS for National Stock Exchange of India, .BO for Bombay Stock Exchange, .L for London Stock Exchange.
+        days: Number of days into the past to fetch.
+
+    Returns:
+        A string message containing closing price of the stock.
+    
+    """
     try:
         stock = yf.Ticker(ticker)
         hist = stock.history(period=f"{days}d")
@@ -184,7 +193,17 @@ def get_prediction_chart(ticker: str, predictions, current_price, volatility):
     
     return image_url
 
-def predict_stock_price(ticker: str, days: int):
+def predict_stock_price(ticker: str, days: int) -> str:
+    """
+    Predicts the stock price of a stock few days into the future. Use this when the time duration is interms of days, weeks , months or year. Model trained on data from Yahoo Finance, using custom built transformer.
+
+    Args:
+        ticker: Ticker symbol of the stock to predict. Append .NS for National Stock Exchange of India, .BO for Bombay Stock Exchange, .L for London Stock Exchange.
+        days: Number of days into the future to predict.
+
+    Returns:
+        A string message containing the prediction price, link to graph plot and other details.
+    """
     try:
         from stock_prediction_transformer import StockManager
         stock_manager = StockManager()
@@ -252,29 +271,8 @@ def predict_stock_price(ticker: str, days: int):
             f"📊 **Model Accuracy:** {accuracy:.2f}%. While I try to be precise, the market can be unpredictable! 🎢\n\n"
             f"📈 **Prediction Chart:** [View Graph]({img_url})"
         )
-
-        """
-        # Use Gemini to generate a summary
-        try:
-            # Summary generation
-            summary_prompt = (
-                f"Summarize the stock prediction for {ticker}. The predicted price is {predicted_price:.2f}, "
-                f"current price is {current_price:.2f}, and the expected change is {change_str}. "
-                f"The model's accuracy is {accuracy:.2f}%. Provide a short and clear summary."
-            )
-            
-            summary_response = model.generate_content(summary_prompt)
-            summary = summary_response.text.strip()
-        except Exception as e:
-            print(f"Error generating summary: {e}")
-            summary = "A brief overview of the stock prediction could not be generated."
         
-        
-        # Combine the conversational response with the summary
-        full_response = f"{response}\n\n**Summary:** {summary}"
-        """
-        
-        return response
+        return str(response)
 
     except Exception as e:
         import traceback
@@ -582,7 +580,7 @@ def get_news_sentiment(ticker: str, topic: str) -> str:
     Gives the top 10 news artical on the provided topic on a provided stock company. News data obtained from Alpha Vantage.
 
     Args:
-        ticker: The ticker symbol of the stock company whose news to retrieve.
+        ticker: The ticker symbol of the stock company whose news to retrieve. Append .NS for National Stock Exchange of India, .BSE for Bombay Stock Exchange of India.
         topic: The topic of the news required. Available are blockchain, manufacturing, real_estate, retail_wholesale, technology, earnings, ipo, mergers_and_acquisitions, financial_markets, economic_monetary, economic_macro, life_science, economy_fiscal, energy_transportation, finance
         
     Returns:
@@ -622,7 +620,7 @@ def get_intraday_stock(ticker: str, mins: int) -> str:
     Gives the intraday stock price of a company few mins in the past, data obtained from Alpha Vantage.
 
     Args:
-        ticker: The ticker symbol of US based stock whose price to obtain.
+        ticker: The ticker symbol of stock whose price to obtain. Append .NS for National Stock Exchange of India, .BSE for Bombay Stock Exchange of India.
         mins: Number of minutes into the past to obtain the data.
     Returns:
         A string message giving all the data.
@@ -649,6 +647,91 @@ def get_intraday_stock(ticker: str, mins: int) -> str:
         return str(cleaned_data)
     except Exception as e:
         return f"Something went wrong: {data}"
+    
+def predict_stock_intraday_price(ticker: str, mins: int) -> str:
+    """
+    Predicts the intraday stock price after few minutes of a stock. Use this when time is in terms of mins and hours. Model trained on data from Alpha Vantage, using custom transformer model.
+    
+    Args:
+        ticker: Ticker symbol of the stock to predict. Append .NS for National Stock Exchange of India, .BSE for Bombay Stock Exchange of India. If .NS doesn't work then try .BSE for the same stock.
+        mins: Number of minutes into the future to predict.
+    Returns:
+        A string message containing the stock price, link to generated graph and other details.
+    """
+    try:
+        from stock_prediction_transformer_intraday import StockManager
+        stock_manager = StockManager()
+        
+        # Ensure models directory exists
+        models_dir = "models"
+        if not os.path.exists(models_dir):
+            try:
+                os.makedirs(models_dir)
+                print(f"📁 Created models directory: {models_dir}")
+            except Exception as dir_error:
+                print(f"❌ Error creating models directory: {dir_error}")
+                return f"❌ Failed to create models directory: {dir_error}"
+
+        model_path = os.path.join(models_dir, f"{ticker}_model_intraday.pt")
+        print(f"🔍 Checking model path: {model_path}")
+
+        if not os.path.exists(model_path):
+            print(f"⚠️ No pre-trained model found for {ticker}. Training now...")
+            try:
+                add_msg = stock_manager.add_stock(ticker)
+                print(f"📌 Add Stock Result: {add_msg}")
+
+                if "Failed" in add_msg:
+                    return f"❌ Failed to add stock {ticker}. Try again."
+
+                train_msg = stock_manager.train_stock(ticker)
+                print(f"📌 Train Result: {train_msg}")
+
+                eval_msg, _ = stock_manager.evaluate_stock(ticker)
+                print(f"📌 Evaluation Result: {eval_msg}")
+            except Exception as train_error:
+                print(f"❌ Training error: {train_error}")
+                return f"❌ Error during model training: {train_error}"
+
+        # Pass the correctly formatted duration instead of `days`
+        try:
+            _, predictions, info = stock_manager.predict_stock(ticker, mins)
+        except Exception as pred_error:
+            print(f"❌ Prediction error: {pred_error}")
+            return f"❌ Error during stock prediction: {pred_error}"
+
+        print(f"📊 Raw Predictions for {mins}: {predictions}")
+
+        if predictions is None or len(predictions) == 0:
+            return "❌ Model did not generate valid multi-day predictions."
+
+        predicted_price = round(predictions[-1][0], 2)
+        current_price = info.get("current_price", 0)
+        accuracy = round(info.get("accuracy", 0) * 100, 2)
+        volatility = info.get("volatility", 0.3)
+        
+        img_url = get_prediction_chart(ticker, predictions, current_price, volatility)
+        
+        if current_price > 0:
+            percent_change = round(((predicted_price - current_price) / current_price) * 100, 2)
+            change_str = f"{percent_change:+.2f}% {'increase' if percent_change > 0 else 'decrease'}"
+        else:
+            change_str = "change (Current price unavailable)"
+
+        # Conversational response with line breaks and emojis
+        response = (
+            f"🚀 **Prediction:** The price of **{ticker}** is expected to be **${predicted_price:.2f}** in {mins}.\n\n"
+            f"💰 **Current Price:** ${current_price:.2f}, so we anticipate it to go {change_str}.\n\n"
+            f"📊 **Model Accuracy:** {accuracy:.2f}%. While I try to be precise, the market can be unpredictable! 🎢\n\n"
+            f"📈 **Prediction Chart:** [View Graph]({img_url})"
+        )
+        
+        return str(response)
+
+    except Exception as e:
+        import traceback
+        print("🔥 Error during prediction:", traceback.format_exc())
+        return f"❌ Error predicting stock price for {ticker}: {str(e)}"
 
 # Example usage
 if __name__ == "__main__":
