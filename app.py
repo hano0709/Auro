@@ -127,8 +127,8 @@ def process_audio(audio_data, history):
         yield history
 
 def main():
-    with gr.Blocks(title="NeoFinance") as demo:
-        gr.Markdown("""# NeoFinance
+    with gr.Blocks(title="AuroFinance") as demo:
+        gr.Markdown("""# AuroFinance
         Hello! I am your all-in-one financial assistant (You can ask any doubts regarding Finance).  
         I can perform the following tasks:        
         - Provide financial literacy to help you make better financial decisions.  
